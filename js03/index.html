@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Yu-Chatアプリ</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="manifest" href="site.webmanifest"> 
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<meta name="theme-color" content="#fafafa">
+
+<style>
+  body {
+    margin: 0;
+  }
+
+  /* bootstrapの謎の右の余白を消す */
+  #_wrap {
+    overflow: hidden;
+    background: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  main {
+    flex: 1;
+  }
+
+  section {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  aside {
+    width: 60%;
+  }
+
+  /* スマホ用 */
+  @media screen and (max-width: 768px) {
+    section {
+      width: 95%;
+    }
+
+    aside {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 992px) {
+    aside {
+      display: none;
+    }
+  }
+
+  .line-bc {
+    padding: 20px 10px;
+    max-width: 868px;
+    margin: 15px auto;
+    font-size: 14px;
+    background: #88b3f7;
+  }
+
+  /* 吹き出し左 */
+  .balloon1 {
+    position: relative;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #000;
+    color: #fff;
+    max-width: 250px;
+    font-size: 15px;
+    word-wrap: break-word;
+    margin-left: 10px;
+  }
+
+  /* 三角アイコン左 */
+  .balloon1::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 3px;
+    left: -19px;
+    border: 8px solid transparent;
+    border-right: 18px solid #000;
+    -webkit-transform: rotate(35deg);
+    transform: rotate(35deg);
+  }
+
+  /* 吹き出し右 */
+  .balloon2 {
+    position: relative;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #30e852;
+    max-width: 250px;
+    font-size: 15px;
+    word-wrap: break-word;
+    margin-right: 20px;
+  }
+
+  /* 三角アイコン右 */
+  .balloon2::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: -19px;
+    border: 8px solid transparent;
+    border-left: 18px solid #30e852;
+    -webkit-transform: rotate(-35deg);
+    transform: rotate(-35deg);
+  }
+</style>
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+<div id="app">
+  <div id="_wrap">
+    <header>
+      <div class="row">
+        <div class="col-12 clearfix">
+          <div class=" text-center">
+            <h1 style="font-size: 50px">yu-chat</h1>
+          </div>
+          <div class="float-right">
+            <button type="button" class="btn btn-success">ログイン</button>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+    </header>
+  <div>
+    <div id="output" class="line-bc" style="overflow: scroll; height: 400px;  width: 600px; " ></div>
+  
+    
+    <div class="form-group text-center">
+      <input type="text" id="uname" maxlength="15"
+      placeholder="ハンドルネ－ム"
+      size="30"
+      value="名無し"></div>
+    <div class="form-group">
+      <textarea id="text" style="max-width: 400px; margin: 0 auto"
+      class="form-control"
+      id="textarea"
+      placeholder="メッセージ 150文字以内"
+      maxlength="150"
+      rows="3">
+      </textarea>
+      <div class="text-center">
+        <button id="send" class="message-area-button" class="btn btn-primary">送信</button>
+      </div>
+    
+    </div>
+  </div>
+
+  <!--/ コンテンツ表示画面 -->
+
+
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- JQuery -->
+
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- //ファイヤーベースを読み込む条件 -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>   -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase.js"></script>
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+      https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-analytics.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAgYIrETyvasAzF5mczUSoiNLx5Vg57tAY",
+      authDomain: "gurutto-46be3.firebaseapp.com",
+      projectId: "gurutto-46be3",
+      storageBucket: "gurutto-46be3.appspot.com",
+      messagingSenderId: "637049832789",
+      appId: "1:637049832789:web:e8c0674d35242354255bdc"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    //データベースに接続するための呪文 refとはデータベースのこと
+    let ref = firebase.database().ref();
+    //送信ボタンをクリックしたら
+    //データベースにデータを送信する
+    $("#send").on("click", function(){
+    let time = new Date(). toLocaleString({timeone:`Asia/Tokyo`})  
+    const uname = $("#uname").val();
+    const text =$("#text").val();
+    const msg = {
+      time: time,
+      uname: uname,
+      text: text
+      }
+      ref.push(msg);
+      $("#text").val("");
+    });
+    $("#output").animate(
+        { scrollTop: $("#output").get(0).scrollHeight 
+      });
+      
+    //データベースに追加されたときに
+    //データの更新を行う
+    ref.on("child_added",function(data){
+      const v = data.val(); //val()を使ってデータを取ってくる
+      const k = data.key;  //ユニークキーを取得
+      const h = `<p>${v.uname}<br>${v.text}</p>`;
+      $("#output").append(h);
+    });
+
+    //enter押したら送信される仕組み
+    $("#text").on("keydown", function(e){
+      console.log(e);
+      // e.keyCode === 13はEnterを押したという動作のみを表現している
+      if(e.keyCode === 13) {
+        let time = new Date(). toLocaleString({timezone: `Asia/Tokyo`})
+        const uname = $("#uname").val();
+        const text = $("#text").val();
+        const msg = {
+          time: time,
+          uname: uname, // uname: "hori"
+          text: text    // text: "堀です"
+     }
+      ref.push(msg);
+      $("#text").val("");
+    // 送信したら、最下位にスクロールされる。
+      $("#output").animate(
+        { scrollTop: $("#output").get(0).scrollHeight 
+      });
+      }
+    });
+
+    // refはデータベースを監視する
+    ref.on("child_added", function (data) {
+      const v = data.val() //val()を使ってデータを取得する
+      const k = data.key; //val()を使ってデータを取得する
+      // v = {uname:"なまえ", text="内容"}が帰ってくる
+      // const h = '<dl id="'+ k +'"><dd><img src="imgs/'+img[v.icon]+'" width="50"></dd><div class="msg"><dd class="time">'+v.time+'</dd><br><dd class="text"><br>'+v.text+'</dd></div></dl>';
+      const h = `
+      <div id=${k} class='chat'>
+        <div class='chat__img'><img src='imgs/${img[v.icon]}'></div>
+        <div class='chat__date'>${v.time}</div>
+        <div class='chat__text'>${v.text}</div>
+      </div>
+    `
+      $("#output").append(h);
+    });
+
+  // データベースに追加された時に
+  // データの更新を行う
+  </script>
+
+ </div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
