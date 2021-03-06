@@ -209,12 +209,12 @@
       
     //データベースに追加されたときに
     //データの更新を行う
-    ref.on("child_added",function(data){
-      const v = data.val(); //val()を使ってデータを取ってくる
-      const k = data.key;  //ユニークキーを取得
-      const h = `<p>${v.uname}<br>${v.text}</p>`;
-      $("#output").append(h);
-    });
+    // ref.on("child_added",function(data){
+    //   const v = data.val(); //val()を使ってデータを取ってくる
+    //   const k = data.key;  //ユニークキーを取得
+    //   const h = `<p>${v.uname}<br>${v.text}</p>`;
+    //   $("#output").append(h);
+    // });
 
     //enter押したら送信される仕組み
     $("#text").on("keydown", function(e){
@@ -246,8 +246,8 @@
       // const h = '<dl id="'+ k +'"><dd><img src="imgs/'+img[v.icon]+'" width="50"></dd><div class="msg"><dd class="time">'+v.time+'</dd><br><dd class="text"><br>'+v.text+'</dd></div></dl>';
       const h = `
       <div id=${k} class='chat'>
-        <div class='chat__img'><img src='imgs/${img[v.icon]}'></div>
         <div class='chat__date'>${v.time}</div>
+        <div class='chat__date'>${v.uname}</div>
         <div class='chat__text'>${v.text}</div>
       </div>
     `
