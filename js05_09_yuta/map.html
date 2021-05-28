@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type='text/javascript'
+    src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
+
+<script type='text/javascript'>
+function GetMap()
+{
+var map = new Microsoft.Maps.Map('#myMap', {
+    credentials: 'Ag84K4BlVg3oSoS87Dcoq7hu37H6kxwJyg-4IEZP6Cf3Rf3TWnVfeA6jYniYcvxd',
+    center: new Microsoft.Maps.Location(41.79059122517039, 140.74851710233725),
+    mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+    zoom: 10
+});
+
+//Add your post map load code here.
+}
+</script>
+
+
+</head>
+<body>
+   <div id="myMap" style="position:relative;width:600px;height:400px;"></div>
+</body>
+</html>
